@@ -18,7 +18,7 @@ CODE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(CODE_DIR)
 from Evaluate import evaluate_classification
 
-DATA_DIR = os.path.join(CODE_DIR, 'data')
+DATA_DIR = os.path.join(CODE_DIR, 'Data')
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))     # saves models next to this script
 # ----------------------------------------------------------------------
 # Task: classify a medical transcription into its medical specialty.
@@ -32,7 +32,7 @@ OUT_DIR = os.path.dirname(os.path.abspath(__file__))     # saves models next to 
 # ----------------------------------------------------------------------
 
 # Manual keywords: edit/extend these. Keys must match the specialty labels exactly
-# (any key that isn't a label in the data is ignored).
+# (any key that isn't a label in the Data is ignored).
 MANUAL_KEYWORDS = {
     'Cardiovascular / Pulmonary': ['chest pain', 'atrial fibrillation', 'coronary', 'ecg', 'ekg', 'stent',
                                    'catheterization', 'ejection fraction', 'shortness of breath', 'copd'],
@@ -70,8 +70,8 @@ def read_data():
     train_df['transcription'] = train_df['transcription'].astype(str)
     test_df['transcription'] = test_df['transcription'].astype(str)
 
-    print(f'shape of train data is {train_df.shape}')
-    print(f'shape of test data is {test_df.shape}')
+    print(f'shape of train Data is {train_df.shape}')
+    print(f'shape of test Data is {test_df.shape}')
     return train_df.reset_index(drop=True), test_df.reset_index(drop=True)
 
 

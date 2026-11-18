@@ -4,9 +4,9 @@ from datasets import load_dataset
 from sklearn.model_selection import train_test_split
 
 '''
-Shared data preparation for the NLP final project (Group 2).
+Shared Data preparation for the NLP final project (Group 2).
 Run once:  python DataPrep.py
-Creates:   data/train.csv  and  data/test.csv
+Creates:   Data/train.csv  and  Data/test.csv
 
 Each file has ALL notes and ALL task rows (instruction + task_output), one row per note per task.
 The split is done by note (transcription), so all tasks of a note are on the same side.
@@ -16,7 +16,7 @@ It is EMPTY for notes that don't pass the classification filters
 (document types like "Discharge Summary", or specialties with < 50 notes).
 
 How to use:
-    train = pd.read_csv('data/train.csv')
+    train = pd.read_csv('Data/train.csv')
 
     # generation (all notes), e.g. summaries
     summ = train[train['instruction'].str.contains('summar', case=False)]
@@ -41,7 +41,7 @@ KEEP_COLUMNS = ['sample_name', 'instruction', 'task_output', 'transcription', 'd
                 'medical_specialty', 'keywords', 'derived_keywords', 'transcription_length', 'normalized_length',
                 'complexity_score']
 
-OUT_DIR = 'data'
+OUT_DIR = 'Data'
 
 # ----------------------------- 1. load -----------------------------
 df = load_dataset('DataFog/medical-transcription-instruct')['train'].to_pandas()
@@ -66,7 +66,7 @@ print(f'unique notes: {df["transcription"].nunique()}')
 #  2. prefer specific specialties over Surgery / General Medicine (broad catch-all labels)
 #  3. among specific labels, prefer the smaller class (reduces class imbalance)
 #  4. any remaining tie keeps the dataset order (kind='stable')
-# These filters only affect the CLASSIFICATION label. Every note stays in the data for generation.
+# These filters only affect the CLASSIFICATION label. Every note stays in the Data for generation.
 labels = df[~df['medical_specialty'].isin(DROP_CLASSES)][['transcription', 'medical_specialty']].drop_duplicates()
 note_counts = labels.groupby('medical_specialty')['transcription'].nunique()   # notes per specialty
 labels['_generic'] = labels['medical_specialty'].isin(GENERIC)
@@ -113,8 +113,8 @@ train_notes, test_notes = train_test_split(notes['transcription'], test_size=TES
 train_df = df[df['transcription'].isin(set(train_notes))].reset_index(drop=True)
 test_df = df[df['transcription'].isin(set(test_notes))].reset_index(drop=True)
 
-print(f'shape of train data is {train_df.shape}  ({train_df["transcription"].nunique()} notes)')
-print(f'shape of test data is {test_df.shape}  ({test_df["transcription"].nunique()} notes)')
+print(f'shape of train Data is {train_df.shape}  ({train_df["transcription"].nunique()} notes)')
+print(f'shape of test Data is {test_df.shape}  ({test_df["transcription"].nunique()} notes)')
 
 # ----------------------------- 7. save -----------------------------
 os.makedirs(OUT_DIR, exist_ok=True)

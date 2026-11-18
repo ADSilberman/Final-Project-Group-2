@@ -13,10 +13,10 @@ Usage (from your model's script):
     evaluate_classification(test_df['medical_specialty'], y_pred, model_name='Rule-Based', task='specialty')
     evaluate_generation(test_df['description'], summaries, model_name='Rule-Based', task='summary')
 
-Each call prints the scores and adds one row to results/results.csv.
+Each call prints the scores and adds one row to Results/Results.csv.
 '''
 
-RESULTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results', 'results.csv')
+RESULTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Results', 'Results.csv')
 
 
 def save_result(row):
@@ -93,9 +93,9 @@ def evaluate_generation(references, predictions, model_name, task='summary'):
     return scores
 
 
-# ----------------------------- show all results -----------------------------
+# ----------------------------- show all Results -----------------------------
 if __name__ == '__main__':
     if os.path.exists(RESULTS_FILE):
         print(pd.read_csv(RESULTS_FILE).to_string(index=False))
     else:
-        print('No results yet.')
+        print('No Results yet.')

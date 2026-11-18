@@ -25,7 +25,7 @@ print(len(df['transcription'].unique()))
 print(df['instruction'].unique())
 
 #%%
-"""Drop classes that don't have enough representation in the data and that are not a medical specialty"""
+"""Drop classes that don't have enough representation in the Data and that are not a medical specialty"""
 classification_data = df[df['instruction'] == 'Identify the medical specialty for this transcription']
 print(classification_data['medical_specialty'].value_counts())
 
