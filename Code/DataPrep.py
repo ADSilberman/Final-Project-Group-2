@@ -49,7 +49,7 @@ print(f'raw rows: {df.shape[0]}')
 
 # ----------------------------- 2. clean -----------------------------
 df = df[KEEP_COLUMNS]
-df = df.dropna(subset=['transcription', 'medical_specialty'])
+df = df.dropna(subset=['transcription'])
 
 df['transcription'] = df['transcription'].str.strip()
 df['medical_specialty'] = df['medical_specialty'].str.strip()
