@@ -36,15 +36,20 @@ OUT_DIR = os.path.dirname(os.path.abspath(__file__))     # saves models next to 
 MANUAL_KEYWORDS = {
     'Cardiovascular / Pulmonary': ['chest pain', 'atrial fibrillation', 'coronary', 'ecg', 'ekg', 'stent',
                                    'catheterization', 'ejection fraction', 'shortness of breath', 'copd'],
-    'Orthopedic': ['fracture', 'knee', 'shoulder', 'arthroplasty', 'tendon', 'ligament', 'hip', 'spine'],
-    'Neurology': ['seizure', 'headache', 'stroke', 'mri of the brain', 'neuropathy', 'tremor', 'eeg'],
+    'Orthopedic': ['fracture', 'knee', 'shoulder', 'arthroplasty', 'tendon', 'ligament', 'hip'],
     'Gastroenterology': ['colonoscopy', 'endoscopy', 'abdominal pain', 'colon', 'polyp', 'gerd', 'esophagus'],
-    'Urology': ['bladder', 'prostate', 'kidney stone', 'cystoscopy', 'urinary', 'hematuria'],
+    'Neurology': ['seizure', 'headache', 'stroke', 'neuropathy', 'tremor', 'eeg', 'dementia'],
+    'Neurosurgery': ['craniotomy', 'laminectomy', 'discectomy', 'spinal fusion', 'cervical', 'lumbar'],
     'Obstetrics / Gynecology': ['pregnancy', 'uterus', 'cesarean', 'gestation', 'ovary', 'vaginal'],
+    'Urology': ['bladder', 'prostate', 'kidney stone', 'cystoscopy', 'urinary', 'hematuria'],
+    'Nephrology': ['renal failure', 'dialysis', 'creatinine', 'chronic kidney disease', 'proteinuria'],
     'Radiology': ['ct scan', 'x-ray', 'ultrasound', 'impression', 'contrast'],
-    'Nephrology': ['renal failure', 'dialysis', 'creatinine', 'kidney'],
+    'Hematology - Oncology': ['chemotherapy', 'lymphoma', 'leukemia', 'anemia', 'metastatic', 'tumor'],
+    'ENT - Otolaryngology': ['tonsillectomy', 'sinus', 'nasal', 'larynx', 'tympanic'],
     'Ophthalmology': ['cataract', 'retina', 'visual acuity', 'intraocular', 'cornea'],
-    'ENT - Otolaryngology': ['tonsillectomy', 'sinus', 'ear', 'nasal', 'larynx'],
+    'Pediatrics - Neonatal': ['infant', 'newborn', 'neonatal', 'immunizations', 'birth weight'],
+    'Pain Management': ['epidural', 'steroid injection', 'nerve block', 'chronic pain', 'facet'],
+    'Psychiatry / Psychology': ['depression', 'anxiety', 'bipolar', 'psychiatric', 'suicidal', 'mood'],
 }
 
 N_AUTO_KEYWORDS = 15        # words learned per specialty from train notes
@@ -56,9 +61,12 @@ def read_data():
     train_df = pd.read_csv(os.path.join(DATA_DIR, 'train.csv'))
     test_df = pd.read_csv(os.path.join(DATA_DIR, 'test.csv'))
 
-    # one row per note for classification (files have one row per task)
-    train_df = train_df.drop_duplicates(subset='transcription')[['transcription', 'medical_specialty']]
-    test_df = test_df.drop_duplicates(subset='transcription')[['transcription', 'medical_specialty']]
+    # classification uses only notes that have a label (DataPrep leaves it empty for the rest),
+    # and one row per note (files have one row per task)
+    train_df = train_df.dropna(subset=['medical_specialty']).drop_duplicates(subset='transcription')
+    test_df = test_df.dropna(subset=['medical_specialty']).drop_duplicates(subset='transcription')
+    train_df = train_df[['transcription', 'medical_specialty']]
+    test_df = test_df[['transcription', 'medical_specialty']]
     train_df['transcription'] = train_df['transcription'].astype(str)
     test_df['transcription'] = test_df['transcription'].astype(str)
 
