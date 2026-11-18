@@ -16,7 +16,7 @@ Usage (from your model's script):
 Each call prints the scores and adds one row to Results/Results.csv.
 '''
 
-RESULTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Results', 'Results.csv')
+RESULTS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Results', 'results.csv')
 
 
 def save_result(row):
