@@ -12,6 +12,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.pipeline import FeatureUnion
 from sklearn.svm import LinearSVC
 from joblib import dump
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
 
 # shared evaluation file lives one folder up (Code/Evaluate.py)
 CODE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,7 +56,7 @@ MANUAL_KEYWORDS = {
 }
 
 N_AUTO_KEYWORDS = 15        # words learned per specialty from train notes
-RULE_WEIGHT = 1.0           # how strongly rule features count in the hybrid model
+RULE_WEIGHT = 1        # how strongly rule features count in the hybrid model
 
 
 # ------------------------Data------------------------------------------
@@ -87,9 +90,10 @@ def learn_keywords(texts, labels, n=N_AUTO_KEYWORDS):
     keywords = {}
     for c in np.unique(labels):
         in_c = labels == c
+        eps = 1e-3  # use to avoid log(0)
         p_in = np.asarray(X[in_c].mean(axis=0)).ravel()
         p_out = np.asarray(X[~in_c].mean(axis=0)).ravel()
-        score = p_in - p_out
+        score = np.log(p_in + eps) - np.log(p_out + eps)
         top = [i for i in np.argsort(score)[::-1][:n] if score[i] > 0]   # only words more common in this class
         keywords[str(c)] = [str(vocab[i]) for i in top]
     return keywords
@@ -157,7 +161,15 @@ def make_vectorizer(use_rules=False):
 def model_training(train_df, use_rules=False):
     vectorizer = make_vectorizer(use_rules)
     X_train = vectorizer.fit_transform(train_df['transcription'], train_df['medical_specialty'])
-    model = LinearSVC(C=0.3, random_state=42)
+    # model = LinearSVC(C=0.3, random_state=42)
+    # model = MultinomialNB()
+    # model = LogisticRegression()
+    model = GradientBoostingClassifier(
+        n_estimators=10,
+        learning_rate=0.01,
+        max_depth=2,
+        random_state=42
+    )
     model.fit(X_train, train_df['medical_specialty'])
     return model, vectorizer
 
@@ -183,25 +195,25 @@ def main():
     y_test = test_df['medical_specialty']
 
     # 1. Rule-based
-    rules = RuleFeatures().fit(train_df['transcription'], train_df['medical_specialty'])
-    for c in rules.classes_[:5]:
-        print(f'{c}: {rules.keywords_[c][:10]}')
-    majority = train_df['medical_specialty'].mode()[0]
-    rule_preds = rule_based_predict(rules, test_df['transcription'], fallback=majority)
-    evaluate_classification(y_test, rule_preds, model_name='Rule-Based', task='specialty')
-    save_keywords(rules.keywords_)
+    # rules = RuleFeatures().fit(train_df['transcription'], train_df['medical_specialty'])
+    # for c in rules.classes_[:5]:
+    #     print(f'{c}: {rules.keywords_[c][:10]}')
+    # majority = train_df['medical_specialty'].mode()[0]
+    # rule_preds = rule_based_predict(rules, test_df['transcription'], fallback=majority)
+    # evaluate_classification(y_test, rule_preds, model_name='Rule-Based', task='specialty')
+    # save_keywords(rules.keywords_)
 
     # 2. Classical (TF-IDF + LinearSVC)
     model, vectorizer = model_training(train_df, use_rules=False)
     preds = model_testing(model, vectorizer, test_df)
-    evaluate_classification(y_test, preds, model_name='TF-IDF + LinearSVC', task='specialty')
+    evaluate_classification(y_test, preds, model_name='TF-IDF + Gradient Bossting', task='specialty')
     save(model, 'classical_model.joblib')
     save(vectorizer, 'classical_vectorizer.joblib')
 
     # 3. Hybrid (TF-IDF + rule features + LinearSVC)
     model, vectorizer = model_training(train_df, use_rules=True)
     preds = model_testing(model, vectorizer, test_df)
-    evaluate_classification(y_test, preds, model_name='Hybrid (Rules + TF-IDF + LinearSVC)', task='specialty')
+    evaluate_classification(y_test, preds, model_name='Hybrid (Rules + TF-IDF + Gradient Boosting)', task='specialty')
     save(model, 'hybrid_model.joblib')
     save(vectorizer, 'hybrid_vectorizer.joblib')
 
