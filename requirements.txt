@@ -1,0 +1,17 @@
+# Third-party packages imported by the scripts in Code/.
+# Install:  pip install -r requirements.txt
+
+# Data loading (DataPrep.py, Classical/DataExploration.py)
+datasets>=2.14        # Hugging Face loader for DataFog/medical-transcription-instruct
+pandas>=2.0
+
+# Classification (Classical/ClassicalModel.py, Evaluate.py)
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.2     # needs get_feature_names_out
+joblib>=1.2
+spacy>=3.5            # only spacy.blank('en') is used, so no model download is needed
+
+# Generation metrics (Evaluate.evaluate_generation; downloads NLTK wordnet on first run)
+nltk>=3.8             # meteor_score needs pre-tokenized input (3.6.6+)
+rouge-score>=0.1.2
