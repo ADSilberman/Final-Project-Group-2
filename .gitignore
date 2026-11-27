@@ -221,3 +221,6 @@ __marimo__/
 
 .DS_Store
 *.joblib
+
+# Course documentation
+FinalProject_NLP.pdf
